@@ -1,0 +1,31 @@
+name: collect
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: superstar-edge
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: collect results
+        env:
+          FC_OUT: data
+        run: |
+          git config user.name "superstar-edge"
+          git config user.email "edge@users.noreply.github.com"
+          git fetch origin data 2>/dev/null || true
+          git checkout data 2>/dev/null || git checkout -B data
+          python scripts/collect.py
+          git add -f data/results.jsonl data/stats.json
+          git diff --cached --quiet || git commit -m "edge data: $(date -u +%FT%TZ)"
+          git push origin data || echo "push skipped"
