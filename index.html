@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUPERSTAR EDGE — Kalshi 15-min XRP time-slot statistics</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f8fafc; color: #1e293b; }
+h1 { text-align: center; }
+.sub { text-align: center; color: #64748b; margin-bottom: 30px; }
+.card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { color: #64748b; font-weight: 600; }
+.up { color: #16a34a; font-weight: 700; }
+.down { color: #dc2626; font-weight: 700; }
+.stars { color: #f59e0b; }
+.heatmap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 15px; }
+.cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; cursor: pointer; }
+.legend { display: flex; gap: 15px; justify-content: center; margin-top: 10px; font-size: 12px; color: #64748b; }
+#status { text-align: center; color: #94a3b8; font-size: 13px; margin-top: 20px; }
+</style>
+</head>
+<body>
+<h1>⭐ SUPERSTAR EDGE</h1>
+<p class="sub">Kalshi 15-minute XRP time-slot statistics — historical UP/DOWN win rates by time of day.<br>Research only. Statistics, not predictions.</p>
+
+<div class="card">
+<h2>🔥 Significant slots</h2>
+<p style="color:#64748b;font-size:13px">Slots where UP% differs significantly from 50% (z-test). More stars = stronger evidence.</p>
+<table id="sig-table">
+<tr><th>Slot (ET)</th><th>UP%</th><th>Z-score</th><th></th><th>n</th></tr>
+<tr><td colspan="5" style="color:#94a3b8">loading…</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>🗺️ 24-hour heatmap</h2>
+<p style="color:#64748b;font-size:13px">Each cell = one 15-min slot. Green = UP edge, red = DOWN edge, gray = neutral.</p>
+<div class="heatmap" id="heatmap"></div>
+<div class="legend"><span>🟢 Strong UP</span><span>🔴 Strong DOWN</span><span>⚪ Neutral</span></div>
+</div>
+
+<div class="card">
+<h2>📊 All slots</h2>
+<table id="all-table">
+<tr><th>Slot (ET)</th><th>UP%</th><th>Z</th><th>n</th></tr>
+<tr><td colspan="4" style="color:#94a3b8">loading…</td></tr>
+</table>
+</div>
+
+<div id="status"></div>
+
+<script>
+const REPO = 'MisoPrettyStacks/Superstar-Edge';
+async function load() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/data/data/stats.json?t=${Date.now()}`);
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    render(d);
+    document.getElementById('status').textContent =
+      `${d.total_windows} windows collected · updated ${new Date(d.generated).toLocaleString()}`;
+  } catch(e) {
+    document.getElementById('status').textContent = 'Collecting data — check back soon.';
+  }
+}
+function render(d) {
+  // Significant table
+  const sig = d.significant || [];
+  let html = '<tr><th>Slot (ET)</th><th>UP%</th><th>Z-score</th><th></th><th>n</th></tr>';
+  if (!sig.length) html += '<tr><td colspan="5" style="color:#94a3b8">No significant slots yet — more data needed.</td></tr>';
+  for (const s of sig.slice(0, 20)) {
+    const cls = s.up_pct >= 50 ? 'up' : 'down';
+    const arrow = s.up_pct >= 50 ? '▲' : '▼';
+    html += `<tr><td>${s.slot_et}</td><td class="${cls}">${arrow} ${s.up_pct}%</td><td>${s.z}</td><td class="stars">${'★'.repeat(s.stars)}</td><td>${s.n}</td></tr>`;
+  }
+  document.getElementById('sig-table').innerHTML = html;
+  // Heatmap (96 slots)
+  const bySlot = {};
+  for (const s of d.slots || []) bySlot[s.slot_et] = s;
+  let hm = '';
+  for (let h = 0; h < 24; h++) {
+    for (let q = 0; q < 4; q++) {
+      const slot = `${String(h).padStart(2,'0')}:${String(q*15).padStart(2,'0')}`;
+      const s = bySlot[slot];
+      let bg = '#cbd5e1', label = '';
+      if (s && s.n >= 3) {
+        const edge = s.up_pct - 50;
+        if (Math.abs(edge) < 5) { bg = '#cbd5e1'; }
+        else if (edge > 0) { bg = edge > 10 ? '#16a34a' : '#86efac'; }
+        else { bg = edge < -10 ? '#dc2626' : '#fca5a5'; }
+        label = Math.round(s.up_pct);
+      }
+      const hh = h % 12 === 0 ? 12 : h % 12;
+      const ap = h < 12 ? 'a' : 'p';
+      hm += `<div class="cell" style="background:${bg}" title="${slot} ET: ${s ? s.up_pct + '% UP (n=' + s.n + ')' : 'no data'}">${label}</div>`;
+    }
+  }
+  document.getElementById('heatmap').innerHTML = hm;
+  // All slots table
+  let all = '<tr><th>Slot (ET)</th><th>UP%</th><th>Z</th><th>n</th></tr>';
+  for (const s of (d.slots || []).slice().sort((a,b) => a.slot_et.localeCompare(b.slot_et))) {
+    const cls = s.up_pct >= 50 ? 'up' : 'down';
+    all += `<tr><td>${s.slot_et}</td><td class="${cls}">${s.up_pct}%</td><td>${s.z}</td><td>${s.n}</td></tr>`;
+  }
+  document.getElementById('all-table').innerHTML = all;
+}
+setInterval(load, 60000);
+load();
+</script>
+</body>
+</html>
