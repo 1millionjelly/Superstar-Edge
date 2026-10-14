@@ -3,53 +3,151 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SUPERSTAR EDGE — Kalshi 15-min XRP time-slot statistics</title>
+<title>SUPERSTAR EDGE</title>
 <style>
-body { font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f8fafc; color: #1e293b; }
-h1 { text-align: center; }
-.sub { text-align: center; color: #64748b; margin-bottom: 30px; }
-.card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-th { color: #64748b; font-weight: 600; }
-.up { color: #16a34a; font-weight: 700; }
-.down { color: #dc2626; font-weight: 700; }
-.stars { color: #f59e0b; }
-.heatmap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 15px; }
-.cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; cursor: pointer; }
-.legend { display: flex; gap: 15px; justify-content: center; margin-top: 10px; font-size: 12px; color: #64748b; }
-#status { text-align: center; color: #94a3b8; font-size: 13px; margin-top: 20px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; background: linear-gradient(135deg, #d4d4d8 0%, #e4e4e7 50%, #d4d4d8 100%); color: #18181b; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 48px 24px; }
+.dash { background: #ffffff; border-radius: 28px; box-shadow: 0 32px 80px rgba(0,0,0,.14), 0 4px 16px rgba(0,0,0,.06); max-width: 1180px; width: 100%; padding: 36px 36px 28px; }
+/* Header */
+.hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; }
+.hdr-left { display: flex; align-items: center; gap: 12px; }
+.logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; }
+.hdr h1 { font-size: 17px; font-weight: 700; letter-spacing: 3px; }
+.hdr-right { display: flex; gap: 8px; align-items: center; }
+.pill { background: #f4f4f8; border-radius: 20px; padding: 7px 16px; font-size: 11px; font-weight: 600; color: #6366f1; letter-spacing: .8px; }
+.dot-live { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.15); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+/* KPI row */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.kpi { background: #fafafc; border: 1px solid #f0f0f4; border-radius: 18px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; transition: transform .15s, box-shadow .15s; }
+.kpi:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+.kpi-ic { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; font-weight: 700; flex-shrink: 0; }
+.kpi-lb { font-size: 10px; color: #a1a1aa; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+.kpi-vl { font-size: 23px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpi-sub { font-size: 11px; color: #a1a1aa; }
+/* Grid */
+.grid { display: grid; grid-template-columns: 300px 1fr 300px; gap: 14px; }
+.col { display: flex; flex-direction: column; gap: 14px; }
+.card { background: #fafafc; border: 1px solid #f0f0f4; border-radius: 18px; padding: 20px; }
+.card h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.card .sub { font-size: 11px; color: #a1a1aa; margin-bottom: 14px; }
+.card.wide { grid-column: 1 / -1; }
+/* Donut */
+.donut-wrap { display: flex; justify-content: center; gap: 24px; }
+.donut { text-align: center; }
+.donut svg { display: block; }
+.donut-lb { font-size: 11px; color: #a1a1aa; margin-top: 6px; }
+.donut-vl { font-size: 15px; font-weight: 700; }
+/* Bars */
+.bars { display: flex; align-items: flex-end; gap: 5px; height: 110px; }
+.bar { flex: 1; border-radius: 5px 5px 2px 2px; min-width: 0; transition: height .4s; }
+.bar.up { background: linear-gradient(180deg, #818cf8, #6366f1); }
+.bar.dn { background: linear-gradient(180deg, #fda4af, #f43f5e); }
+.bar.nt { background: #e4e4e7; }
+.bar-x { display: flex; gap: 5px; margin-top: 6px; }
+.bar-x span { flex: 1; text-align: center; font-size: 8px; color: #a1a1aa; }
+/* Table */
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; font-size: 10px; color: #a1a1aa; text-transform: uppercase; letter-spacing: .6px; padding: 6px 8px; border-bottom: 1px solid #ececf1; }
+td { padding: 8px; border-bottom: 1px solid #f4f4f7; font-variant-numeric: tabular-nums; }
+tr:last-child td { border: none; }
+.up { color: #059669; font-weight: 700; }
+.dn { color: #e11d48; font-weight: 700; }
+.stars { color: #f59e0b; font-size: 11px; letter-spacing: 1px; }
+/* Heatmap */
+.hm { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; }
+.hm-c { display: flex; flex-direction: column; gap: 3px; }
+.hm-h { font-size: 8px; color: #a1a1aa; text-align: center; }
+.hm-cell { aspect-ratio: 1; border-radius: 3px; cursor: pointer; transition: transform .1s; }
+.hm-cell:hover { transform: scale(1.25); }
+.legend { display: flex; gap: 14px; justify-content: center; margin-top: 12px; font-size: 10px; color: #a1a1aa; }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; }
+/* Footer */
+.ftr { text-align: center; margin-top: 22px; padding-top: 16px; border-top: 1px solid #f0f0f4; font-size: 11px; color: #a1a1aa; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .kpis { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
-<h1>SUPERSTAR EDGE</h1>
-<p class="sub">Kalshi 15-minute XRP time-slot statistics — historical UP/DOWN win rates by time of day.<br>Research only. Statistics, not predictions.</p>
+<div class="dash">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="logo">S</div>
+      <h1>SUPERSTAR EDGE</h1>
+    </div>
+    <div class="hdr-right">
+      <span class="dot-live"></span>
+      <span class="pill">KALSHI &middot; XRP 15-MIN</span>
+    </div>
+  </div>
 
-<div class="card">
-<h2>Significant slots</h2>
-<p style="color:#64748b;font-size:13px">Slots where UP% differs significantly from 50% (z-test). More stars = stronger evidence.</p>
-<table id="sig-table">
-<tr><th>Slot (ET)</th><th>UP%</th><th>Z-score</th><th></th><th>n</th></tr>
-<tr><td colspan="5" style="color:#94a3b8">loading…</td></tr>
-</table>
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-ic" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">&#9670;</div>
+      <div><div class="kpi-lb">Windows tracked</div><div class="kpi-value kpi-vl" id="k1">—</div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-ic" style="background:linear-gradient(135deg,#10b981,#34d399)">&#9650;</div>
+      <div><div class="kpi-lb">Significant slots</div><div class="kpi-value kpi-vl" id="k2">—</div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-ic" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">&#9733;</div>
+      <div><div class="kpi-lb">Strongest edge</div><div class="kpi-value kpi-vl" id="k3">—</div><div class="kpi-sub" id="k3s"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-ic" style="background:linear-gradient(135deg,#f43f5e,#fb7185)">&#9679;</div>
+      <div><div class="kpi-lb">Slot coverage</div><div class="kpi-value kpi-vl" id="k4">—</div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="card">
+        <h3>Outcome split</h3>
+        <div class="sub">All recorded windows</div>
+        <div class="donut-wrap" id="donuts"></div>
+      </div>
+      <div class="card">
+        <h3>Significant slots</h3>
+        <div class="sub">Z-test vs 50% null</div>
+        <table id="sig-tbl"><tr><td style="color:#a1a1aa">loading</td></tr></table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>UP% across 24 hours</h3>
+        <div class="sub">Average win rate per hour (ET) &middot; dashed line = 50%</div>
+        <svg id="area-chart" viewBox="0 0 600 220" style="width:100%;height:auto"></svg>
+      </div>
+      <div class="card">
+        <h3>Slot heatmap</h3>
+        <div class="sub">96 fifteen-minute slots &middot; green UP edge, red DOWN edge</div>
+        <div class="hm" id="hm"></div>
+        <div class="legend">
+          <span><i style="background:#10b981"></i>Strong UP</span>
+          <span><i style="background:#a7f3d0"></i>Mild UP</span>
+          <span><i style="background:#e4e4e7"></i>Neutral</span>
+          <span><i style="background:#fecdd3"></i>Mild DOWN</span>
+          <span><i style="background:#f43f5e"></i>Strong DOWN</span>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>Hourly distribution</h3>
+        <div class="sub">Windows per hour</div>
+        <div class="bars" id="bars"></div>
+        <div class="bar-x" id="bars-x"></div>
+      </div>
+      <div class="card">
+        <h3>Top edges</h3>
+        <div class="sub">Largest deviations from 50%</div>
+        <table id="top-tbl"><tr><td style="color:#a1a1aa">loading</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr" id="status">loading</div>
 </div>
-
-<div class="card">
-<h2>24-hour heatmap</h2>
-<p style="color:#64748b;font-size:13px">Each cell = one 15-min slot. Green = UP edge, red = DOWN edge, gray = neutral.</p>
-<div class="heatmap" id="heatmap"></div>
-<div class="legend"><span>Strong UP</span><span>Strong DOWN</span><span>Neutral</span></div>
-</div>
-
-<div class="card">
-<h2>All slots</h2>
-<table id="all-table">
-<tr><th>Slot (ET)</th><th>UP%</th><th>Z</th><th>n</th></tr>
-<tr><td colspan="4" style="color:#94a3b8">loading…</td></tr>
-</table>
-</div>
-
-<div id="status"></div>
 
 <script>
 const REPO = 'MisoPrettyStacks/Superstar-Edge';
@@ -57,49 +155,154 @@ async function load() {
   try {
     const r = await fetch(`https://raw.githubusercontent.com/${REPO}/data/data/stats.json?t=${Date.now()}`);
     if (!r.ok) throw new Error(r.status);
-    const d = await r.json();
-    render(d);
-    document.getElementById('status').textContent =
-      `${d.total_windows} windows collected · updated ${new Date(d.generated).toLocaleString()}`;
+    render(await r.json());
   } catch(e) {
     document.getElementById('status').textContent = 'Collecting data — check back soon.';
   }
 }
-function render(d) {
-  const sig = d.significant || [];
-  let html = '<tr><th>Slot (ET)</th><th>UP%</th><th>Z-score</th><th></th><th>n</th></tr>';
-  if (!sig.length) html += '<tr><td colspan="5" style="color:#94a3b8">No significant slots yet — more data needed.</td></tr>';
-  for (const s of sig.slice(0, 20)) {
-    const cls = s.up_pct >= 50 ? 'up' : 'down';
-    const arrow = s.up_pct >= 50 ? '▲' : '▼';
-    html += `<tr><td>${s.slot_et}</td><td class="${cls}">${arrow} ${s.up_pct}%</td><td>${s.z}</td><td class="stars">${'★'.repeat(s.stars)}</td><td>${s.n}</td></tr>`;
+function smooth(pts) {
+  if (pts.length < 2) return '';
+  let d = `M ${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0,y0] = pts[i-1], [x1,y1] = pts[i];
+    const cx = (x0+x1)/2;
+    d += ` C ${cx},${y0} ${cx},${y1} ${x1},${y1}`;
   }
-  document.getElementById('sig-table').innerHTML = html;
-  const bySlot = {};
-  for (const s of d.slots || []) bySlot[s.slot_et] = s;
-  let hm = '';
+  return d;
+}
+function render(d) {
+  const slots = d.slots || [];
+  // KPIs
+  document.getElementById('k1').textContent = d.total_windows || 0;
+  document.getElementById('k2').textContent = (d.significant || []).length;
+  const t0 = slots[0];
+  document.getElementById('k3').textContent = t0 ? t0.up_pct + '%' : '—';
+  document.getElementById('k3s').textContent = t0 ? t0.slot_et + ' ET' : '';
+  document.getElementById('k4').textContent = slots.length + '/96';
+  // Donuts: overall UP/DOWN
+  let up = 0, dn = 0;
+  for (const s of slots) { up += s.up; dn += s.down; }
+  const tot = up + dn || 1, upP = (up / tot * 100);
+  const circ = 2 * Math.PI * 34;
+  document.getElementById('donuts').innerHTML = `
+    <div class="donut">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle cx="45" cy="45" r="34" fill="none" stroke="#f0f0f4" stroke-width="11"/>
+        <circle cx="45" cy="45" r="34" fill="none" stroke="url(#g1)" stroke-width="11"
+          stroke-dasharray="${(upP/100*circ).toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
+          transform="rotate(-90 45 45)"/>
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+        </linearGradient></defs>
+        <text x="45" y="50" text-anchor="middle" font-size="16" font-weight="700" fill="#18181b">${upP.toFixed(0)}%</text>
+      </svg>
+      <div class="donut-vl" style="color:#059669">UP</div><div class="donut-lb">${up} windows</div>
+    </div>
+    <div class="donut">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle cx="45" cy="45" r="34" fill="none" stroke="#f0f0f4" stroke-width="11"/>
+        <circle cx="45" cy="45" r="34" fill="none" stroke="url(#g2)" stroke-width="11"
+          stroke-dasharray="${((100-upP)/100*circ).toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
+          transform="rotate(-90 45 45)"/>
+        <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fb7185"/><stop offset="1" stop-color="#f43f5e"/>
+        </linearGradient></defs>
+        <text x="45" y="50" text-anchor="middle" font-size="16" font-weight="700" fill="#18181b">${(100-upP).toFixed(0)}%</text>
+      </svg>
+      <div class="donut-vl" style="color:#e11d48">DOWN</div><div class="donut-lb">${dn} windows</div>
+    </div>`;
+  // Area chart: hourly UP%
+  const hrs = {};
+  for (const s of slots) {
+    const h = s.slot_et.slice(0,2);
+    if (!hrs[h]) hrs[h] = {up:0,n:0};
+    hrs[h].up += s.up; hrs[h].n += s.n;
+  }
+  const W = 600, H = 220, P = 28;
+  const yOf = p => H - P - ((p - 20) / 60) * (H - 2*P);
+  const xOf = h => P + (h / 23) * (W - 2*P);
+  const pts = [];
   for (let h = 0; h < 24; h++) {
-    for (let q = 0; q < 4; q++) {
-      const slot = `${String(h).padStart(2,'0')}:${String(q*15).padStart(2,'0')}`;
-      const s = bySlot[slot];
-      let bg = '#cbd5e1', label = '';
-      if (s && s.n >= 3) {
-        const edge = s.up_pct - 50;
-        if (Math.abs(edge) < 5) { bg = '#cbd5e1'; }
-        else if (edge > 0) { bg = edge > 10 ? '#16a34a' : '#86efac'; }
-        else { bg = edge < -10 ? '#dc2626' : '#fca5a5'; }
-        label = Math.round(s.up_pct);
+    const k = String(h).padStart(2,'0'), hd = hrs[k];
+    const p = hd && hd.n ? hd.up/hd.n*100 : 50;
+    pts.push([xOf(h).toFixed(1), yOf(Math.max(20,Math.min(80,p))).toFixed(1)]);
+  }
+  const line = smooth(pts);
+  const area = line + ` L ${xOf(23)},${H-P} L ${xOf(0)},${H-P} Z`;
+  let svg = `<defs>
+    <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#818cf8" stop-opacity=".45"/><stop offset="1" stop-color="#818cf8" stop-opacity=".03"/>
+    </linearGradient>
+    <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c4b5fd" stop-opacity=".3"/><stop offset="1" stop-color="#c4b5fd" stop-opacity=".02"/>
+    </linearGradient></defs>`;
+  // gridlines
+  for (const gv of [30,50,70]) {
+    svg += `<line x1="${P}" y1="${yOf(gv)}" x2="${W-P}" y2="${yOf(gv)}" stroke="#ececf1" stroke-width="1" ${gv===50?'stroke-dasharray="5,4" stroke="#c4b5fd"':''}/>`;
+    svg += `<text x="${P-4}" y="${yOf(gv)+4}" text-anchor="end" font-size="9" fill="#a1a1aa">${gv}%</text>`;
+  }
+  svg += `<path d="${area}" fill="url(#ag)"/><path d="${area}" fill="url(#ag2)" transform="translate(0,14)" opacity=".6"/>`;
+  svg += `<path d="${line}" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>`;
+  // dots at significant deviations
+  for (let h = 0; h < 24; h++) {
+    const k = String(h).padStart(2,'0'), hd = hrs[k];
+    if (hd && hd.n >= 8) {
+      const p = hd.up/hd.n*100;
+      if (Math.abs(p-50) >= 12) {
+        svg += `<circle cx="${xOf(h)}" cy="${yOf(Math.max(20,Math.min(80,p)))}" r="4.5" fill="#f43f5e" stroke="#fff" stroke-width="2"/>`;
       }
-      hm += `<div class="cell" style="background:${bg}" title="${slot} ET: ${s ? s.up_pct + '% UP (n=' + s.n + ')' : 'no data'}">${label}</div>`;
     }
   }
-  document.getElementById('heatmap').innerHTML = hm;
-  let all = '<tr><th>Slot (ET)</th><th>UP%</th><th>Z</th><th>n</th></tr>';
-  for (const s of (d.slots || []).slice().sort((a,b) => a.slot_et.localeCompare(b.slot_et))) {
-    const cls = s.up_pct >= 50 ? 'up' : 'down';
-    all += `<tr><td>${s.slot_et}</td><td class="${cls}">${s.up_pct}%</td><td>${s.z}</td><td>${s.n}</td></tr>`;
+  for (const h of [0,6,12,18,23]) {
+    svg += `<text x="${xOf(h)}" y="${H-8}" text-anchor="middle" font-size="9" fill="#a1a1aa">${String(h).padStart(2,'0')}:00</text>`;
   }
-  document.getElementById('all-table').innerHTML = all;
+  document.getElementById('area-chart').innerHTML = svg;
+  // Bars: windows per hour
+  const maxN = Math.max(1, ...Object.values(hrs).map(x => x.n));
+  let bars = '', bx = '';
+  for (let h = 0; h < 24; h++) {
+    const k = String(h).padStart(2,'0'), hd = hrs[k];
+    const n = hd ? hd.n : 0, p = hd && hd.n ? hd.up/hd.n*100 : 50;
+    const cls = n < 3 ? 'nt' : (p >= 55 ? 'up' : (p <= 45 ? 'dn' : 'nt'));
+    const ht = Math.max(4, n/maxN*100);
+    bars += `<div class="bar ${cls}" style="height:${ht}%" title="${k}:00 — ${n} windows, ${p.toFixed(0)}% UP"></div>`;
+    if (h % 4 === 0) bx += `<span style="flex:4">${k}</span>`; 
+  }
+  document.getElementById('bars').innerHTML = bars;
+  document.getElementById('bars-x').innerHTML = bx;
+  // Tables
+  const sig = d.significant || [];
+  let sh = '<tr><th>Slot</th><th>UP%</th><th>Z</th><th></th></tr>';
+  if (!sig.length) sh += '<tr><td colspan="4" style="color:#a1a1aa">Collecting data…</td></tr>';
+  for (const s of sig.slice(0,6)) {
+    sh += `<tr><td>${s.slot_et}</td><td class="${s.up_pct>=50?'up':'dn'}">${s.up_pct}%</td><td>${s.z}</td><td class="stars">${'★'.repeat(s.stars)}</td></tr>`;
+  }
+  document.getElementById('sig-tbl').innerHTML = sh;
+  let th2 = '<tr><th>Slot</th><th>UP%</th><th>n</th></tr>';
+  for (const s of slots.slice(0,6)) {
+    th2 += `<tr><td>${s.slot_et}</td><td class="${s.up_pct>=50?'up':'dn'}">${s.up_pct}%</td><td>${s.n}</td></tr>`;
+  }
+  document.getElementById('top-tbl').innerHTML = th2;
+  // Heatmap
+  const byS = {}; for (const s of slots) byS[s.slot_et] = s;
+  let hm = '';
+  for (let h = 0; h < 24; h++) {
+    const k = String(h).padStart(2,'0');
+    hm += `<div class="hm-c"><div class="hm-h">${k}</div>`;
+    for (let q = 0; q < 4; q++) {
+      const sl = `${k}:${String(q*15).padStart(2,'0')}`, s = byS[sl];
+      let bg = '#f0f0f4';
+      if (s && s.n >= 3) {
+        const e = s.up_pct - 50;
+        bg = Math.abs(e)<5 ? '#e4e4e7' : e>0 ? (e>10?'#10b981':'#a7f3d0') : (e<-10?'#f43f5e':'#fecdd3');
+      }
+      hm += `<div class="hm-cell" style="background:${bg}" title="${sl} ET: ${s?s.up_pct+'% UP (n='+s.n+')':'no data'}"></div>`;
+    }
+    hm += '</div>';
+  }
+  document.getElementById('hm').innerHTML = hm;
+  document.getElementById('status').textContent =
+    `${d.total_windows} windows · updated ${new Date(d.generated).toLocaleString()} · research only`;
 }
 setInterval(load, 60000);
 load();
