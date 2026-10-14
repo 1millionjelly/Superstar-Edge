@@ -5,70 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SUPERSTAR EDGE — Kalshi 15-min XRP time-slot statistics</title>
 <style>
-/* 12 Shades of Pink palette */
-:root {
-  --cream: #f6f1e7;
-  --ink: #3a2e33;
-  --pink: #ff69b4;
-  --ballet-slipper: #f4a7c3;
-  --bubblegum: #ff5da2;
-  --taffy: #ff8fb8;
-  --lemonade: #ffc4dd;
-  --rouge: #d63a55;
-  --flamingo: #fc8eac;
-  --watermelon: #ff6b81;
-  --blush: #ffd6e8;
-  --punch: #e63946;
-  --hot-pink: #ff1493;
-  --rose: #e85d85;
-}
-body { font-family: 'Courier New', monospace; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--cream); color: var(--ink); }
-h1 { text-align: center; color: var(--hot-pink); letter-spacing: 4px; font-size: 2.2em; margin-bottom: 5px; }
-.sub { text-align: center; color: var(--rose); margin-bottom: 30px; font-size: 14px; line-height: 1.6; }
-.card { background: var(--blush); border: 2px solid var(--taffy); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-.card h2 { color: var(--bubblegum); margin-top: 0; }
-.card p { color: var(--rose); font-size: 13px; }
+body { font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f8fafc; color: #1e293b; }
+h1 { text-align: center; }
+.sub { text-align: center; color: #64748b; margin-bottom: 30px; }
+.card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--blush); }
-th { color: var(--hot-pink); font-weight: 700; }
-.up { color: var(--hot-pink); font-weight: 700; }
-.down { color: var(--punch); font-weight: 700; }
-.stars { color: var(--flamingo); }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { color: #64748b; font-weight: 600; }
+.up { color: #16a34a; font-weight: 700; }
+.down { color: #dc2626; font-weight: 700; }
+.stars { color: #f59e0b; }
 .heatmap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 15px; }
-.cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; cursor: pointer; }
-.legend { display: flex; gap: 15px; justify-content: center; margin-top: 10px; font-size: 12px; color: var(--rose); }
-#status { text-align: center; color: var(--taffy); font-size: 13px; margin-top: 20px; }
-.divider { border: none; border-top: 2px solid var(--blush); margin: 30px 0; }
-a { color: var(--hot-pink); }
+.cell { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: #fff; cursor: pointer; }
+.legend { display: flex; gap: 15px; justify-content: center; margin-top: 10px; font-size: 12px; color: #64748b; }
+#status { text-align: center; color: #94a3b8; font-size: 13px; margin-top: 20px; }
 </style>
 </head>
 <body>
 <h1>⭐ SUPERSTAR EDGE</h1>
-<p class="sub">Kalshi 15-minute XRP time-slot statistics<br>historical UP/DOWN win rates by time of day<br><em>research only — statistics, not predictions</em></p>
-
-<hr class="divider">
+<p class="sub">Kalshi 15-minute XRP time-slot statistics — historical UP/DOWN win rates by time of day.<br>Research only. Statistics, not predictions.</p>
 
 <div class="card">
 <h2>🔥 Significant slots</h2>
-<p>Slots where UP% differs significantly from 50% (z-test). More stars = stronger evidence.</p>
+<p style="color:#64748b;font-size:13px">Slots where UP% differs significantly from 50% (z-test). More stars = stronger evidence.</p>
 <table id="sig-table">
 <tr><th>Slot (ET)</th><th>UP%</th><th>Z-score</th><th></th><th>n</th></tr>
-<tr><td colspan="5" style="color:var(--taffy)">loading…</td></tr>
+<tr><td colspan="5" style="color:#94a3b8">loading…</td></tr>
 </table>
 </div>
 
 <div class="card">
 <h2>🗺️ 24-hour heatmap</h2>
-<p>Each cell = one 15-min slot. Pink = UP edge, red = DOWN edge, pale = neutral.</p>
+<p style="color:#64748b;font-size:13px">Each cell = one 15-min slot. Green = UP edge, red = DOWN edge, gray = neutral.</p>
 <div class="heatmap" id="heatmap"></div>
-<div class="legend"><span>🌸 Strong UP</span><span>🌹 Strong DOWN</span><span>🤍 Neutral</span></div>
+<div class="legend"><span>🟢 Strong UP</span><span>🔴 Strong DOWN</span><span>⚪ Neutral</span></div>
 </div>
 
 <div class="card">
 <h2>📊 All slots</h2>
 <table id="all-table">
 <tr><th>Slot (ET)</th><th>UP%</th><th>Z</th><th>n</th></tr>
-<tr><td colspan="4" style="color:var(--taffy)">loading…</td></tr>
+<tr><td colspan="4" style="color:#94a3b8">loading…</td></tr>
 </table>
 </div>
 
@@ -91,7 +68,7 @@ async function load() {
 function render(d) {
   const sig = d.significant || [];
   let html = '<tr><th>Slot (ET)</th><th>UP%</th><th>Z-score</th><th></th><th>n</th></tr>';
-  if (!sig.length) html += '<tr><td colspan="5" style="color:var(--taffy)">No significant slots yet — more data needed.</td></tr>';
+  if (!sig.length) html += '<tr><td colspan="5" style="color:#94a3b8">No significant slots yet — more data needed.</td></tr>';
   for (const s of sig.slice(0, 20)) {
     const cls = s.up_pct >= 50 ? 'up' : 'down';
     const arrow = s.up_pct >= 50 ? '▲' : '▼';
@@ -105,12 +82,12 @@ function render(d) {
     for (let q = 0; q < 4; q++) {
       const slot = `${String(h).padStart(2,'0')}:${String(q*15).padStart(2,'0')}`;
       const s = bySlot[slot];
-      let bg = 'var(--ballet-slipper)', label = '';
+      let bg = '#cbd5e1', label = '';
       if (s && s.n >= 3) {
         const edge = s.up_pct - 50;
-        if (Math.abs(edge) < 5) { bg = '#ffd6e8'; }
-        else if (edge > 0) { bg = edge > 10 ? '#ff1493' : '#ff8fb8'; }
-        else { bg = edge < -10 ? '#e63946' : '#fc8eac'; }
+        if (Math.abs(edge) < 5) { bg = '#cbd5e1'; }
+        else if (edge > 0) { bg = edge > 10 ? '#16a34a' : '#86efac'; }
+        else { bg = edge < -10 ? '#dc2626' : '#fca5a5'; }
         label = Math.round(s.up_pct);
       }
       hm += `<div class="cell" style="background:${bg}" title="${slot} ET: ${s ? s.up_pct + '% UP (n=' + s.n + ')' : 'no data'}">${label}</div>`;
