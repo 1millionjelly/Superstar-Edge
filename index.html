@@ -25,7 +25,7 @@
 body { font-family: 'Courier New', monospace; max-width: 1000px; margin: 0 auto; padding: 20px; background: var(--cream); color: var(--ink); }
 h1 { text-align: center; color: var(--hot-pink); letter-spacing: 4px; font-size: 2.2em; margin-bottom: 5px; }
 .sub { text-align: center; color: var(--rose); margin-bottom: 30px; font-size: 14px; line-height: 1.6; }
-.card { background: #fffdf8; border: 2px solid var(--blush); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.card { background: var(--blush); border: 2px solid var(--taffy); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
 .card h2 { color: var(--bubblegum); margin-top: 0; }
 .card p { color: var(--rose); font-size: 13px; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -105,7 +105,7 @@ function render(d) {
     for (let q = 0; q < 4; q++) {
       const slot = `${String(h).padStart(2,'0')}:${String(q*15).padStart(2,'0')}`;
       const s = bySlot[slot];
-      let bg = '#f4a7c3', label = '';
+      let bg = 'var(--ballet-slipper)', label = '';
       if (s && s.n >= 3) {
         const edge = s.up_pct - 50;
         if (Math.abs(edge) < 5) { bg = '#ffd6e8'; }
