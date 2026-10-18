@@ -1,18 +1,18 @@
 {
- "generated": "2026-10-18T13:51:48.000835+00:00",
- "total_windows": 236,
+ "generated": "2026-10-18T14:14:58.596172+00:00",
+ "total_windows": 237,
  "slots": [
   {
-   "slot_et": "04:15",
-   "n": 3,
+   "slot_et": "09:45",
+   "n": 4,
    "up": 0,
-   "down": 3,
+   "down": 4,
    "up_pct": 0.0,
-   "z": -1.73,
-   "stars": 1
+   "z": -2.0,
+   "stars": 2
   },
   {
-   "slot_et": "09:45",
+   "slot_et": "04:15",
    "n": 3,
    "up": 0,
    "down": 3,
@@ -869,16 +869,16 @@
  ],
  "significant": [
   {
-   "slot_et": "04:15",
-   "n": 3,
+   "slot_et": "09:45",
+   "n": 4,
    "up": 0,
-   "down": 3,
+   "down": 4,
    "up_pct": 0.0,
-   "z": -1.73,
-   "stars": 1
+   "z": -2.0,
+   "stars": 2
   },
   {
-   "slot_et": "09:45",
+   "slot_et": "04:15",
    "n": 3,
    "up": 0,
    "down": 3,
